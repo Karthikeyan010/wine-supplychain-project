@@ -6,13 +6,13 @@ import UpdateStatusForm from "./components/UpdateStatusForm";
 import BatchViewer from "./components/BatchViewer";
 import BatchHistoryViewer from "./components/BatchHistoryViewer";
 import BatchDetails from "./components/BatchDetails";
-import AdminDashboard from "./components/AdminDashboard"; // ✅ Admin Panel
-import { Link } from 'react-router-dom'; // Add this at the top
+import AdminDashboard from "./components/AdminDashboard";
+import { Link } from 'react-router-dom';
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// ✅ Replace this with your actual admin wallet address
+// ✅ Replace with your real admin wallet address
 const ADMIN_ADDRESS = "0xeCeBBC9a32d33AbCFB5EB452066084083500bdD9";
 
 function App() {
@@ -20,32 +20,30 @@ function App() {
   const [userAddress, setUserAddress] = useState("");
   const [userRole, setUserRole] = useState("");
 
-  // 🔄 Receive both address and role from MetaMaskConnect
   const handleConnect = (address, role) => {
     setUserAddress(address);
     setUserRole(role);
   };
 
+  const isHome = location.pathname === "/";
+
   return (
     <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
       <h1>🍷 Wine Supply Chain DApp</h1>
 
-      {/* ✅ Show Admin Panel link if user is admin */}
       {userAddress.toLowerCase() === ADMIN_ADDRESS.toLowerCase() && (
         <p style={{ marginTop: "1rem" }}>
-         
-         <Link to="/admin">Go to Admin Panel</Link>
-
+          <Link to="/admin">Go to Admin Panel</Link>
         </p>
       )}
 
       <MetaMaskConnect onConnect={handleConnect} />
 
       <Routes>
-        {/* ✅ QR-based detail view route */}
+        {/* ✅ Route for QR scanned /batch/:id view */}
         <Route path="/batch/:batchId" element={<BatchDetails />} />
 
-        {/* ✅ Admin-only route */}
+        {/* ✅ Route for Admin Dashboard */}
         <Route
           path="/admin"
           element={
@@ -57,16 +55,18 @@ function App() {
           }
         />
 
-        {/* ✅ Role-based homepage */}
+        {/* ✅ Main Homepage */}
         <Route
           path="/"
           element={
-            <>
-              {userRole === "Producer" && <RegisterBatchForm />}
-              {userRole === "Distributor" && <UpdateStatusForm />}
-              <BatchViewer />
-              <BatchHistoryViewer />
-            </>
+            isHome && (
+              <>
+                {userRole === "Producer" && <RegisterBatchForm />}
+                {userRole === "Distributor" && <UpdateStatusForm />}
+                <BatchViewer />
+                <BatchHistoryViewer />
+              </>
+            )
           }
         />
       </Routes>

@@ -6,3 +6,6 @@
 
 # Ignore frontend build folder
 wine-ui/dist
+
+# Local Netlify folder
+.netlify
