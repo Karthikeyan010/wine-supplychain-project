@@ -12,7 +12,6 @@ import { Link } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// ✅ Replace with your real admin wallet address
 const ADMIN_ADDRESS = "0xeCeBBC9a32d33AbCFB5EB452066084083500bdD9";
 
 function App() {
@@ -31,19 +30,21 @@ function App() {
     <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
       <h1>🍷 Wine Supply Chain DApp</h1>
 
-      {userAddress.toLowerCase() === ADMIN_ADDRESS.toLowerCase() && (
-        <p style={{ marginTop: "1rem" }}>
-          <Link to="/admin">Go to Admin Panel</Link>
-        </p>
+      {/* Only show MetaMask & role logic on homepage */}
+      {isHome && (
+        <>
+          {userAddress.toLowerCase() === ADMIN_ADDRESS.toLowerCase() && (
+            <p style={{ marginTop: "1rem" }}>
+              <Link to="/admin">Go to Admin Panel</Link>
+            </p>
+          )}
+          <MetaMaskConnect onConnect={handleConnect} />
+        </>
       )}
 
-      <MetaMaskConnect onConnect={handleConnect} />
-
       <Routes>
-        {/* ✅ Route for QR scanned /batch/:id view */}
         <Route path="/batch/:batchId" element={<BatchDetails />} />
 
-        {/* ✅ Route for Admin Dashboard */}
         <Route
           path="/admin"
           element={
@@ -55,18 +56,15 @@ function App() {
           }
         />
 
-        {/* ✅ Main Homepage */}
         <Route
           path="/"
           element={
-            isHome && (
-              <>
-                {userRole === "Producer" && <RegisterBatchForm />}
-                {userRole === "Distributor" && <UpdateStatusForm />}
-                <BatchViewer />
-                <BatchHistoryViewer />
-              </>
-            )
+            <>
+              {userRole === "Producer" && <RegisterBatchForm />}
+              {userRole === "Distributor" && <UpdateStatusForm />}
+              <BatchViewer />
+              <BatchHistoryViewer />
+            </>
           }
         />
       </Routes>
