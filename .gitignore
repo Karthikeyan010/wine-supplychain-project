@@ -1,0 +1,8 @@
+# Ignore all node_modules folders in subdirectories
+**/node_modules
+
+# Ignore all .env files in all folders
+**/.env
+
+# Ignore frontend build folder
+wine-ui/dist
