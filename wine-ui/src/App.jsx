@@ -8,14 +8,12 @@ import BatchHistoryViewer from "./components/BatchHistoryViewer";
 import BatchDetails from "./components/BatchDetails";
 import AdminDashboard from "./components/AdminDashboard";
 import { Link } from 'react-router-dom';
-
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const ADMIN_ADDRESS = "0xeCeBBC9a32d33AbCFB5EB452066084083500bdD9";
 
 function App() {
-  const location = useLocation();
   const [userAddress, setUserAddress] = useState("");
   const [userRole, setUserRole] = useState("");
 
@@ -24,27 +22,15 @@ function App() {
     setUserRole(role);
   };
 
-  const isHome = location.pathname === "/";
-
   return (
     <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
       <h1>🍷 Wine Supply Chain DApp</h1>
 
-      {/* Only show MetaMask & role logic on homepage */}
-      {isHome && (
-        <>
-          {userAddress.toLowerCase() === ADMIN_ADDRESS.toLowerCase() && (
-            <p style={{ marginTop: "1rem" }}>
-              <Link to="/admin">Go to Admin Panel</Link>
-            </p>
-          )}
-          <MetaMaskConnect onConnect={handleConnect} />
-        </>
-      )}
-
       <Routes>
+        {/* ✅ PUBLIC Route - No MetaMask */}
         <Route path="/batch/:batchId" element={<BatchDetails />} />
 
+        {/* ✅ Admin-only Route */}
         <Route
           path="/admin"
           element={
@@ -56,10 +42,20 @@ function App() {
           }
         />
 
+        {/* ✅ Authenticated User View */}
         <Route
           path="/"
           element={
             <>
+              {/* Connect only on home route */}
+              <MetaMaskConnect onConnect={handleConnect} />
+
+              {userAddress.toLowerCase() === ADMIN_ADDRESS.toLowerCase() && (
+                <p style={{ marginTop: "1rem" }}>
+                  <Link to="/admin">Go to Admin Panel</Link>
+                </p>
+              )}
+
               {userRole === "Producer" && <RegisterBatchForm />}
               {userRole === "Distributor" && <UpdateStatusForm />}
               <BatchViewer />
