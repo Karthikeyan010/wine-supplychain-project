@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import getContract from "../utils/getContract";
+import getReadOnlyContract from "../utils/getReadOnlyContract";
+
+
 
 const statusEnum = {
   0: "Created",
@@ -26,7 +29,7 @@ const BatchDetails = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const contract = await getContract();
+        const contract = await getReadOnlyContract();
         const batchData = await contract.viewBatch(BigInt(batchId));
         const events = await contract.getBatchHistory(BigInt(batchId));
         setBatch(batchData);

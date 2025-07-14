@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import MetaMaskConnect from "./components/MetaMaskConnect";
 import RegisterBatchForm from "./components/RegisterBatchForm";
 import UpdateStatusForm from "./components/UpdateStatusForm";
@@ -7,6 +7,7 @@ import BatchViewer from "./components/BatchViewer";
 import BatchHistoryViewer from "./components/BatchHistoryViewer";
 import BatchDetails from "./components/BatchDetails";
 import AdminDashboard from "./components/AdminDashboard";
+import MainLayout from "./components/MainLayout"; // ✅ your new layout
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -22,40 +23,51 @@ function App() {
   };
 
   return (
-    <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
-      <h1>🍷 Wine Supply Chain DApp</h1>
-
+    <>
       <Routes>
-        {/* ✅ Public QR route — NO MetaMask */}
+        {/* Public Read-Only Batch Route */}
         <Route path="/batch/:batchId" element={<BatchDetails />} />
 
-        {/* ✅ Authenticated routes */}
-        <Route path="/" element={
-          <>
-            <MetaMaskConnect onConnect={handleConnect} />
-            
-            {userAddress.toLowerCase() === ADMIN_ADDRESS.toLowerCase() && (
-              <p><Link to="/admin">Go to Admin Panel</Link></p>
-            )}
+        {/* Main App Routes (Protected behind Layout) */}
+        <Route
+          path="/"
+          element={
+            <MainLayout
+              userAddress={userAddress}
+              userRole={userRole}
+              handleConnect={handleConnect}
+            />
+          }
+        >
+          {/* Home - role based forms */}
+          <Route
+            index
+            element={
+              <>
+                {userRole === "Producer" && <RegisterBatchForm />}
+                {userRole === "Distributor" && <UpdateStatusForm />}
+                <BatchViewer />
+                <BatchHistoryViewer />
+              </>
+            }
+          />
 
-            {userRole === "Producer" && <RegisterBatchForm />}
-            {userRole === "Distributor" && <UpdateStatusForm />}
-            <BatchViewer />
-            <BatchHistoryViewer />
-          </>
-        } />
-
-        <Route path="/admin" element={
-          userAddress.toLowerCase() === ADMIN_ADDRESS.toLowerCase() ? (
-            <AdminDashboard currentAccount={userAddress} />
-          ) : (
-            <p>⛔ Access Denied – Admins Only</p>
-          )
-        } />
+          {/* Admin Panel */}
+          <Route
+            path="admin"
+            element={
+              userAddress.toLowerCase() === ADMIN_ADDRESS.toLowerCase() ? (
+                <AdminDashboard currentAccount={userAddress} />
+              ) : (
+                <p>⛔ Access Denied – Admins Only</p>
+              )
+            }
+          />
+        </Route>
       </Routes>
 
       <ToastContainer position="top-right" autoClose={3000} />
-    </div>
+    </>
   );
 }
 
